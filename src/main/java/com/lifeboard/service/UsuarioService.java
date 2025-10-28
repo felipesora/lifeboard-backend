@@ -1,6 +1,7 @@
 package com.lifeboard.service;
 
-import com.lifeboard.dto.UsuarioResponseDTO;
+import com.lifeboard.dto.usuario.UsuarioRequestDTO;
+import com.lifeboard.dto.usuario.UsuarioResponseDTO;
 import com.lifeboard.mapper.UsuarioMapper;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Usuario;
@@ -34,17 +35,17 @@ public class UsuarioService {
                 .map(UsuarioMapper::toDTO);
     }
 
-    public UsuarioResponseDTO buscarDTOPorId(Long id) {
+    public UsuarioResponseDTO buscarUsuarioDtoPorId(Long id) {
         var usuario = buscarEntidadePorId(id);
 
         return UsuarioMapper.toDTO(usuario);
     }
 
     @Transactional
-    public UsuarioResponseDTO salvar(Usuario novoUsuario) {
-        criptografarSenhaSeNecessario(novoUsuario);
+    public UsuarioResponseDTO salvar(UsuarioRequestDTO usuarioDTO) {
+        criptografarSenhaSeNecessario(usuarioDTO);
 
-        Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
+        Usuario usuarioSalvo = usuarioRepository.save(UsuarioMapper.toEntity(usuarioDTO));
 
         if (usuarioSalvo.getFinanceiro() == null) {
             Financeiro financeiro = new Financeiro();
@@ -59,20 +60,20 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponseDTO atualizar(Long id, Usuario novoUsuario) {
+    public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO usuarioDTO) {
+        criptografarSenhaSeNecessario(usuarioDTO);
         Usuario usuarioExistente = buscarEntidadePorId(id);
+        Usuario usuarioComNovosDados = UsuarioMapper.toEntity(usuarioDTO);
 
-        usuarioExistente.setNome(novoUsuario.getNome());
-        usuarioExistente.setEmail(novoUsuario.getEmail());
+        usuarioExistente.setNome(usuarioComNovosDados.getNome());
+        usuarioExistente.setEmail(usuarioComNovosDados.getEmail());
 
-        criptografarSenhaSeNecessario(novoUsuario);
-        if (novoUsuario.getSenha() != null && !novoUsuario.getSenha().isBlank()) {
-            usuarioExistente.setSenha(novoUsuario.getSenha());
+        if (usuarioComNovosDados.getSenha() != null && !usuarioComNovosDados.getSenha().isBlank()) {
+            usuarioExistente.setSenha(usuarioComNovosDados.getSenha());
         }
 
-        // Evita sobrescrever o financeiro se vier nulo
-        if (novoUsuario.getFinanceiro() != null) {
-            usuarioExistente.setFinanceiro(novoUsuario.getFinanceiro());
+        if (usuarioComNovosDados.getFinanceiro() != null) {
+            usuarioExistente.setFinanceiro(usuarioComNovosDados.getFinanceiro());
         }
 
         var usuarioAtualizado = usuarioRepository.save(usuarioExistente);
@@ -111,7 +112,7 @@ public class UsuarioService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuário com id: " + id + " não encontrado"));
     }
 
-    private void criptografarSenhaSeNecessario(Usuario usuario) {
+    private void criptografarSenhaSeNecessario(UsuarioRequestDTO usuario) {
         if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         }

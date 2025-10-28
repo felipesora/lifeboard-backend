@@ -1,9 +1,7 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.UsuarioRequestDTO;
-import com.lifeboard.dto.UsuarioResponseDTO;
-import com.lifeboard.mapper.UsuarioMapper;
-import com.lifeboard.model.Usuario;
+import com.lifeboard.dto.usuario.UsuarioRequestDTO;
+import com.lifeboard.dto.usuario.UsuarioResponseDTO;
 import com.lifeboard.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,15 +51,15 @@ public class UsuarioController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
-        var usuario = service.buscarDTOPorId(id);
+        var usuario = service.buscarUsuarioDtoPorId(id);
         return ResponseEntity.ok(usuario);
     }
 
     @Operation(summary = "Cadastrar um novo usuário")
     @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> salvar(@RequestBody @Valid UsuarioRequestDTO dto, UriComponentsBuilder uriBuilder) {
-        var usuario = service.salvar(UsuarioMapper.toEntity(dto));
+    public ResponseEntity<UsuarioResponseDTO> salvar(@RequestBody @Valid UsuarioRequestDTO usuarioDto, UriComponentsBuilder uriBuilder) {
+        var usuario = service.salvar(usuarioDto);
 
         var uri = uriBuilder.path("/api/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
 
@@ -71,8 +69,8 @@ public class UsuarioController {
     @Operation(summary = "Atualizar um usuário existente")
     @SecurityRequirement(name = "bearer-key")
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDTO dto){
-        var usuarioAtualizado = service.atualizar(id, UsuarioMapper.toEntity(dto));
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDTO usuarioDto){
+        var usuarioAtualizado = service.atualizar(id, usuarioDto);
 
         return ResponseEntity.ok(usuarioAtualizado);
     }
