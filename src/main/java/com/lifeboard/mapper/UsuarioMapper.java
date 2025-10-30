@@ -1,6 +1,7 @@
 package com.lifeboard.mapper;
 
 import com.lifeboard.dto.*;
+import com.lifeboard.dto.financeiro.FinanceiroResponseDTO;
 import com.lifeboard.dto.usuario.UsuarioRequestDTO;
 import com.lifeboard.dto.usuario.UsuarioResponseDTO;
 import com.lifeboard.model.Usuario;

@@ -1,12 +1,8 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.FinanceiroRequestDTO;
 import com.lifeboard.dto.TarefaRequestDTO;
 import com.lifeboard.dto.TarefaResponseDTO;
-import com.lifeboard.mapper.FinanceiroMapper;
 import com.lifeboard.mapper.TarefaMapper;
-import com.lifeboard.mapper.UsuarioMapper;
-import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Tarefa;
 import com.lifeboard.model.Usuario;
 import com.lifeboard.service.TarefaService;

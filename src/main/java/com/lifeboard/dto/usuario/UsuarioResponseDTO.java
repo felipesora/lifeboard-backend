@@ -2,7 +2,7 @@ package com.lifeboard.dto.usuario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.lifeboard.dto.FinanceiroResponseDTO;
+import com.lifeboard.dto.financeiro.FinanceiroResponseDTO;
 import com.lifeboard.dto.TarefaResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
