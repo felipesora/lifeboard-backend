@@ -1,12 +1,9 @@
 package com.lifeboard.controller;
 
 import com.lifeboard.dto.meta.MetaFinanceiraUpdateRequestDTO;
-import com.lifeboard.dto.SaldoRequest;
+import com.lifeboard.dto.meta.SaldoRequest;
 import com.lifeboard.dto.meta.MetaFinanceiraSaveRequestDTO;
 import com.lifeboard.dto.meta.MetaFinanceiraResponseDTO;
-import com.lifeboard.mapper.MetaFinanceiraMapper;
-import com.lifeboard.model.Financeiro;
-import com.lifeboard.model.MetaFinanceira;
 import com.lifeboard.service.FinanceiroService;
 import com.lifeboard.service.MetaFinanceiraService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,10 +29,6 @@ public class MetaFinanceiraController {
 
     @Autowired
     private MetaFinanceiraService metaFinanceiraService;
-
-    @Autowired
-    private FinanceiroService financeiroService;
-
 
     @Operation(summary = "Listar todas as metas financeiras", description = "Retorna uma página de metas financeiras com paginação e ordenação")
     @Parameters({

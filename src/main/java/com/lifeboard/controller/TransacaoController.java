@@ -31,10 +31,6 @@ public class TransacaoController {
     @Autowired
     private TransacaoService transacaoService;
 
-    @Autowired
-    private FinanceiroService financeiroService;
-
-
     @Operation(summary = "Listar todas as transações", description = "Retorna uma página de transações com paginação e ordenação")
     @Parameters({
             @Parameter(name = "page", description = "Número da página (começa em 0)", example = "0"),
