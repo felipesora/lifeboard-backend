@@ -1,6 +1,8 @@
 package com.lifeboard.service;
 
-import com.lifeboard.dto.TransacaoResponseDTO;
+import com.lifeboard.dto.financeiro.FinanceiroRequestDTO;
+import com.lifeboard.dto.transacao.TransacaoRequestDTO;
+import com.lifeboard.dto.transacao.TransacaoResponseDTO;
 import com.lifeboard.mapper.TransacaoMapper;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.MetaFinanceira;
@@ -43,32 +45,37 @@ public class TransacaoService {
     }
 
     @Transactional
-    public TransacaoResponseDTO salvar(Transacao transacao) {
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(transacao.getFinanceiro().getId());
+    public TransacaoResponseDTO salvar(TransacaoRequestDTO transacaoDTO) {
+        Financeiro financeiro = financeiroService.buscarEntidadePorId(transacaoDTO.getIdFinanceiro());
 
         BigDecimal saldoAtual = financeiro.getSaldoAtual();
-        BigDecimal valorTransacao = transacao.getValor();
+        BigDecimal valorTransacao = transacaoDTO.getValor();
 
-        if (transacao.getTipo() == TipoTransacao.SAIDA) {
+        if (transacaoDTO.getTipo() == TipoTransacao.SAIDA) {
             if (saldoAtual.compareTo(valorTransacao) < 0) {
                 throw new BadRequestException("Saldo insuficiente para realizar a transação de SAIDA!");
             }
             financeiro.setSaldoAtual(saldoAtual.subtract(valorTransacao));
 
-        } else if (transacao.getTipo() == TipoTransacao.ENTRADA) {
+        } else if (transacaoDTO.getTipo() == TipoTransacao.ENTRADA) {
             financeiro.setSaldoAtual(saldoAtual.add(valorTransacao));
         }
 
-        financeiroService.atualizar(financeiro.getId(), financeiro);
+        FinanceiroRequestDTO financeiroDTO = new FinanceiroRequestDTO();
+        financeiroDTO.setSaldoAtual(financeiro.getSaldoAtual());
+        financeiroDTO.setSalarioMensal(financeiro.getSalarioMensal());
+        financeiroDTO.setUsuarioId(financeiro.getUsuario().getId());
 
-        transacao.setFinanceiro(financeiro);
+        financeiroService.atualizar(financeiro.getId(), financeiroDTO);
+
+        Transacao transacao = TransacaoMapper.toEntity(transacaoDTO, financeiro);
         var transacaoSalva = transacaoRepository.save(transacao);
 
         return TransacaoMapper.toDTO(transacaoSalva);
     }
 
     @Transactional
-    public TransacaoResponseDTO atualizar(Long id, Transacao novaTransacao) {
+    public TransacaoResponseDTO atualizar(Long id, TransacaoRequestDTO transacaoDTO) {
         Transacao transacaoExistente = buscarEntidadePorId(id);
 
         Financeiro financeiro = transacaoExistente.getFinanceiro();
@@ -77,8 +84,8 @@ public class TransacaoService {
         BigDecimal valorTransacaoAntigo = transacaoExistente.getValor();
         TipoTransacao tipoTransacaoAntigo = transacaoExistente.getTipo();
 
-        BigDecimal valorTransacaoNovo = novaTransacao.getValor();
-        TipoTransacao tipoTransacaoNovo = novaTransacao.getTipo();
+        BigDecimal valorTransacaoNovo = transacaoDTO.getValor();
+        TipoTransacao tipoTransacaoNovo = transacaoDTO.getTipo();
 
         // Desfaz o efeito antigo
         if (tipoTransacaoAntigo == TipoTransacao.SAIDA) {
@@ -100,12 +107,18 @@ public class TransacaoService {
         }
 
         financeiro.setSaldoAtual(saldoAtual);
-        financeiroService.atualizar(financeiro.getId(), financeiro);
 
-        transacaoExistente.setDescricao(novaTransacao.getDescricao());
+        FinanceiroRequestDTO financeiroDTO = new FinanceiroRequestDTO();
+        financeiroDTO.setSaldoAtual(financeiro.getSaldoAtual());
+        financeiroDTO.setSalarioMensal(financeiro.getSalarioMensal());
+        financeiroDTO.setUsuarioId(financeiro.getUsuario().getId());
+
+        financeiroService.atualizar(financeiro.getId(), financeiroDTO);
+
+        transacaoExistente.setDescricao(transacaoDTO.getDescricao());
         transacaoExistente.setValor(valorTransacaoNovo);
         transacaoExistente.setTipo(tipoTransacaoNovo);
-        transacaoExistente.setCategoria(novaTransacao.getCategoria());
+        transacaoExistente.setCategoria(transacaoDTO.getCategoria());
 
         var transacaoAtualizada = transacaoRepository.save(transacaoExistente);
 
@@ -163,7 +176,6 @@ public class TransacaoService {
         }
 
         financeiro.setSaldoAtual(saldoAtual);
-//        financeiroService.atualizar(financeiro.getId(), financeiro);
 
         financeiro.getTransacoes().remove(transacao);
 

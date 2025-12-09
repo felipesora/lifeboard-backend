@@ -1,7 +1,7 @@
 package com.lifeboard.mapper;
 
-import com.lifeboard.dto.TarefaRequestDTO;
-import com.lifeboard.dto.TarefaResponseDTO;
+import com.lifeboard.dto.tarefa.TarefaRequestDTO;
+import com.lifeboard.dto.tarefa.TarefaResponseDTO;
 import com.lifeboard.model.Tarefa;
 import com.lifeboard.model.Usuario;
 

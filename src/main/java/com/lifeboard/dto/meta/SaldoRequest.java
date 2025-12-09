@@ -1,4 +1,4 @@
-package com.lifeboard.dto;
+package com.lifeboard.dto.meta;
 
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;

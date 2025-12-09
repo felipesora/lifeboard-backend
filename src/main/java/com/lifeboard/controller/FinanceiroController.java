@@ -1,13 +1,8 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.FinanceiroRequestDTO;
-import com.lifeboard.dto.FinanceiroResponseDTO;
-import com.lifeboard.mapper.FinanceiroMapper;
-import com.lifeboard.model.Financeiro;
-import com.lifeboard.model.Usuario;
-import com.lifeboard.repository.UsuarioRepository;
+import com.lifeboard.dto.financeiro.FinanceiroRequestDTO;
+import com.lifeboard.dto.financeiro.FinanceiroResponseDTO;
 import com.lifeboard.service.FinanceiroService;
-import com.lifeboard.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -15,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,9 +26,6 @@ public class FinanceiroController {
 
     @Autowired
     private FinanceiroService financeiroService;
-
-    @Autowired
-    private UsuarioService usuarioService;
 
     @Operation(summary = "Listar todos os financeiros", description = "Retorna uma página de financeiros com paginação e ordenação")
     @Parameters({
@@ -63,10 +54,7 @@ public class FinanceiroController {
     @ApiResponse(responseCode = "201", description = "Financeiro criado com sucesso")
     @PostMapping
     public ResponseEntity<FinanceiroResponseDTO> salvar(@RequestBody @Valid FinanceiroRequestDTO dto, UriComponentsBuilder uriBuilder){
-        var usuario = usuarioService.buscarEntidadePorId(dto.getUsuarioId());
-
-        Financeiro financeiro = FinanceiroMapper.toEntity(dto, usuario);
-        var financeiroSalvo = financeiroService.salvar(financeiro);
+        var financeiroSalvo = financeiroService.salvar(dto);
 
         var uri = uriBuilder.path("/api/financeiros/{id}").buildAndExpand(financeiroSalvo.getId()).toUri();
 
@@ -76,12 +64,7 @@ public class FinanceiroController {
     @Operation(summary = "Atualizar um financeiro existente")
     @PutMapping("/{id}")
     public ResponseEntity<FinanceiroResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid FinanceiroRequestDTO dto){
-        var usuario = usuarioService.buscarEntidadePorId(dto.getUsuarioId());
-
-        Financeiro novoFinanceiro = FinanceiroMapper.toEntity(dto, usuario);
-
-        var financeiroAtualizado = financeiroService.atualizar(id, novoFinanceiro);
-
+        var financeiroAtualizado = financeiroService.atualizar(id, dto);
         return ResponseEntity.ok(financeiroAtualizado);
     }
 

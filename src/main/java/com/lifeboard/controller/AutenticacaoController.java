@@ -1,7 +1,7 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.AutenticacaoDTO;
-import com.lifeboard.dto.TokenDTO;
+import com.lifeboard.dto.auth.AutenticacaoDTO;
+import com.lifeboard.dto.auth.TokenDTO;
 import com.lifeboard.model.Usuario;
 import com.lifeboard.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
