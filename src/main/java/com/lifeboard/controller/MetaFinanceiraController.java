@@ -1,9 +1,9 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.MetaFinanceiraUpdateRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraUpdateRequestDTO;
 import com.lifeboard.dto.SaldoRequest;
-import com.lifeboard.dto.MetaFinanceiraSaveRequestDTO;
-import com.lifeboard.dto.MetaFinanceiraResponseDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraSaveRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraResponseDTO;
 import com.lifeboard.mapper.MetaFinanceiraMapper;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.MetaFinanceira;
@@ -63,11 +63,8 @@ public class MetaFinanceiraController {
     @Operation(summary = "Cadastrar uma nova meta financeira")
     @ApiResponse(responseCode = "201", description = "Meta financeira criada com sucesso")
     @PostMapping
-    public ResponseEntity<MetaFinanceiraResponseDTO> salvar(@RequestBody @Valid MetaFinanceiraSaveRequestDTO dto, UriComponentsBuilder uriBuilder){
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(dto.getIdFinanceiro());
-        MetaFinanceira meta = MetaFinanceiraMapper.toEntitySave(dto, financeiro);
-
-        var metaSalva = metaFinanceiraService.salvar(meta);
+    public ResponseEntity<MetaFinanceiraResponseDTO> salvar(@RequestBody @Valid MetaFinanceiraSaveRequestDTO metaFinanceiraDTO, UriComponentsBuilder uriBuilder){
+        var metaSalva = metaFinanceiraService.salvar(metaFinanceiraDTO);
 
         var uri = uriBuilder.path("/api/metas/{id}").buildAndExpand(metaSalva.getId()).toUri();
 
@@ -106,13 +103,8 @@ public class MetaFinanceiraController {
 
     @Operation(summary = "Atualizar uma meta financeira")
     @PutMapping("/{id}")
-    public ResponseEntity<MetaFinanceiraResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid MetaFinanceiraUpdateRequestDTO dto){
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(dto.getIdFinanceiro());
-        MetaFinanceira meta = MetaFinanceiraMapper.toEntityUpdate(dto, financeiro);
-        meta.setId(id);
-
-        var metaAtualizada = metaFinanceiraService.atualizar(id,meta);
-
+    public ResponseEntity<MetaFinanceiraResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid MetaFinanceiraUpdateRequestDTO metaFinanceiraDTO){
+        var metaAtualizada = metaFinanceiraService.atualizar(id,metaFinanceiraDTO);
         return ResponseEntity.ok(metaAtualizada);
     }
 

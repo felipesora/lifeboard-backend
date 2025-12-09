@@ -1,8 +1,8 @@
 package com.lifeboard.mapper;
 
-import com.lifeboard.dto.MetaFinanceiraSaveRequestDTO;
-import com.lifeboard.dto.MetaFinanceiraResponseDTO;
-import com.lifeboard.dto.MetaFinanceiraUpdateRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraSaveRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraResponseDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraUpdateRequestDTO;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.MetaFinanceira;
 

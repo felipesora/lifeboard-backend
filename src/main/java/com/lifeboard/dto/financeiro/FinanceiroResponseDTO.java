@@ -2,8 +2,8 @@ package com.lifeboard.dto.financeiro;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.lifeboard.dto.MetaFinanceiraResponseDTO;
-import com.lifeboard.dto.TransacaoResponseDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraResponseDTO;
+import com.lifeboard.dto.transacao.TransacaoResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

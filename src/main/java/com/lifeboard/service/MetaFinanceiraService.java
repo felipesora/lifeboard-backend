@@ -1,6 +1,10 @@
 package com.lifeboard.service;
 
-import com.lifeboard.dto.MetaFinanceiraResponseDTO;
+import com.lifeboard.dto.financeiro.FinanceiroRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraResponseDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraSaveRequestDTO;
+import com.lifeboard.dto.meta.MetaFinanceiraUpdateRequestDTO;
+import com.lifeboard.dto.transacao.TransacaoRequestDTO;
 import com.lifeboard.exception.BadRequestException;
 import com.lifeboard.mapper.MetaFinanceiraMapper;
 import com.lifeboard.model.Financeiro;
@@ -9,9 +13,7 @@ import com.lifeboard.model.Transacao;
 import com.lifeboard.model.enums.CategoriaTransacao;
 import com.lifeboard.model.enums.StatusMeta;
 import com.lifeboard.model.enums.TipoTransacao;
-import com.lifeboard.repository.FinanceiroRepository;
 import com.lifeboard.repository.MetaFinanceiraRepository;
-import com.lifeboard.repository.TransacaoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class MetaFinanceiraService {
@@ -47,25 +48,30 @@ public class MetaFinanceiraService {
     }
 
     @Transactional
-    public MetaFinanceiraResponseDTO salvar(MetaFinanceira metaFinanceira) {
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(metaFinanceira.getFinanceiro().getId());
+    public MetaFinanceiraResponseDTO salvar(MetaFinanceiraSaveRequestDTO metaFinanceiraDTO) {
+        Financeiro financeiro = financeiroService.buscarEntidadePorId(metaFinanceiraDTO.getIdFinanceiro());
 
         BigDecimal saldoAtual = financeiro.getSaldoAtual();
-        BigDecimal valorMetaAtual = metaFinanceira.getValorAtual();
+        BigDecimal valorMetaAtual = metaFinanceiraDTO.getValorAtual();
 
         if (saldoAtual.compareTo(valorMetaAtual) < 0) {
             throw new BadRequestException("Saldo insuficiente para criar esta Meta Financeira!");
         }
 
         financeiro.setSaldoAtual(saldoAtual.subtract(valorMetaAtual));
-        financeiroService.atualizar(financeiro.getId(), financeiro);
 
-        metaFinanceira.setFinanceiro(financeiro);
+        FinanceiroRequestDTO financeiroDTO = new FinanceiroRequestDTO();
+        financeiroDTO.setSaldoAtual(financeiro.getSaldoAtual());
+        financeiroDTO.setSalarioMensal(financeiro.getSalarioMensal());
+        financeiroDTO.setUsuarioId(financeiro.getUsuario().getId());
+
+        financeiroService.atualizar(financeiro.getId(), financeiroDTO);
+
+        MetaFinanceira metaFinanceira = MetaFinanceiraMapper.toEntitySave(metaFinanceiraDTO, financeiro);
 
         definirStatusMetaFinanceiro(metaFinanceira);
 
-        var metaFinanceiraSalva = metaRepository.save(metaFinanceira);
-        return MetaFinanceiraMapper.toDTO(metaFinanceira);
+        return MetaFinanceiraMapper.toDTO(metaRepository.save(metaFinanceira));
     }
 
     @Transactional
@@ -82,16 +88,22 @@ public class MetaFinanceiraService {
         definirStatusMetaFinanceiro(meta);
         metaRepository.save(meta);
 
-        Transacao transacao = new Transacao();
-        transacao.setDescricao("Aplicação na meta: " + meta.getNome());
-        transacao.setValor(valor);
-        transacao.setTipo(TipoTransacao.APLICACAO);
-        transacao.setCategoria(CategoriaTransacao.INVESTIMENTO);
-        transacao.setFinanceiro(financeiro);
-        transacaoService.salvar(transacao);
+        TransacaoRequestDTO transacaoDTO = new TransacaoRequestDTO();
+        transacaoDTO.setDescricao("Aplicação na meta: " + meta.getNome());
+        transacaoDTO.setValor(valor);
+        transacaoDTO.setTipo(TipoTransacao.APLICACAO);
+        transacaoDTO.setCategoria(CategoriaTransacao.INVESTIMENTO);
+        transacaoDTO.setIdFinanceiro(financeiro.getId());
+        transacaoService.salvar(transacaoDTO);
 
         financeiro.setSaldoAtual(saldoFinanceiro.subtract(valor));
-        financeiroService.atualizar(financeiro.getId(), financeiro);
+
+        FinanceiroRequestDTO financeiroDTO = new FinanceiroRequestDTO();
+        financeiroDTO.setSaldoAtual(financeiro.getSaldoAtual());
+        financeiroDTO.setSalarioMensal(financeiro.getSalarioMensal());
+        financeiroDTO.setUsuarioId(financeiro.getUsuario().getId());
+
+        financeiroService.atualizar(financeiro.getId(), financeiroDTO);
     }
 
     @Transactional
@@ -113,28 +125,34 @@ public class MetaFinanceiraService {
         Financeiro financeiro = meta.getFinanceiro();
         BigDecimal saldoFinanceiro = financeiro.getSaldoAtual();
 
-        Transacao transacao = new Transacao();
-        transacao.setDescricao("Retirada da meta: " + meta.getNome());
-        transacao.setValor(valor);
-        transacao.setTipo(TipoTransacao.RESGATE);
-        transacao.setCategoria(CategoriaTransacao.INVESTIMENTO);
-        transacao.setFinanceiro(financeiro);
-        transacaoService.salvar(transacao);
+        TransacaoRequestDTO transacaoDTO = new TransacaoRequestDTO();
+        transacaoDTO.setDescricao("Retirada da meta: " + meta.getNome());
+        transacaoDTO.setValor(valor);
+        transacaoDTO.setTipo(TipoTransacao.RESGATE);
+        transacaoDTO.setCategoria(CategoriaTransacao.INVESTIMENTO);
+        transacaoDTO.setIdFinanceiro(financeiro.getId());
+        transacaoService.salvar(transacaoDTO);
 
         financeiro.setSaldoAtual(saldoFinanceiro.add(valor));
-        financeiroService.atualizar(financeiro.getId(), financeiro);
+
+        FinanceiroRequestDTO financeiroDTO = new FinanceiroRequestDTO();
+        financeiroDTO.setSaldoAtual(financeiro.getSaldoAtual());
+        financeiroDTO.setSalarioMensal(financeiro.getSalarioMensal());
+        financeiroDTO.setUsuarioId(financeiro.getUsuario().getId());
+
+        financeiroService.atualizar(financeiro.getId(), financeiroDTO);
     }
 
     @Transactional
-    public MetaFinanceiraResponseDTO atualizar(Long id, MetaFinanceira novaMeta) {
+    public MetaFinanceiraResponseDTO atualizar(Long id, MetaFinanceiraUpdateRequestDTO metaFinanceiraDTO) {
         MetaFinanceira metaExistente = buscarEntidadePorId(id);
 
         String nomeMetaAntigo = metaExistente.getNome();
-        String nomeMetaNovo = novaMeta.getNome();
+        String nomeMetaNovo = metaFinanceiraDTO.getNome();
 
-        metaExistente.setNome(novaMeta.getNome());
-        metaExistente.setValorMeta(novaMeta.getValorMeta());
-        metaExistente.setDataLimite(novaMeta.getDataLimite());
+        metaExistente.setNome(metaFinanceiraDTO.getNome());
+        metaExistente.setValorMeta(metaFinanceiraDTO.getValorMeta());
+        metaExistente.setDataLimite(metaFinanceiraDTO.getDataLimite());
         definirStatusMetaFinanceiro(metaExistente);
 
         // Atualizar descrições das transações relacionadas

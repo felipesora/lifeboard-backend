@@ -1,6 +1,7 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.*;
+import com.lifeboard.dto.transacao.TransacaoRequestDTO;
+import com.lifeboard.dto.transacao.TransacaoResponseDTO;
 import com.lifeboard.mapper.TransacaoMapper;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Transacao;
@@ -21,9 +22,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/transacoes")
@@ -63,10 +61,8 @@ public class TransacaoController {
     @Operation(summary = "Cadastrar uma nova transação")
     @ApiResponse(responseCode = "201", description = "Transação criada com sucesso")
     @PostMapping
-    public ResponseEntity<TransacaoResponseDTO> salvar(@RequestBody @Valid TransacaoRequestDTO dto, UriComponentsBuilder uriBuilder){
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(dto.getIdFinanceiro());
-        Transacao transacao = TransacaoMapper.toEntity(dto, financeiro);
-        var transacaoSalva = transacaoService.salvar(transacao);
+    public ResponseEntity<TransacaoResponseDTO> salvar(@RequestBody @Valid TransacaoRequestDTO transacaoDTO, UriComponentsBuilder uriBuilder){
+        var transacaoSalva = transacaoService.salvar(transacaoDTO);
 
         var uri = uriBuilder.path("/api/transacoes/{id}").buildAndExpand(transacaoSalva.getId()).toUri();
 
@@ -75,12 +71,8 @@ public class TransacaoController {
 
     @Operation(summary = "Atualizar uma transação existente")
     @PutMapping("/{id}")
-    public ResponseEntity<TransacaoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid TransacaoRequestDTO dto){
-        Financeiro financeiro = financeiroService.buscarEntidadePorId(dto.getIdFinanceiro());
-        Transacao transacao = TransacaoMapper.toEntity(dto, financeiro);
-
-        var transacaoAtualizada = transacaoService.atualizar(id,transacao);
-
+    public ResponseEntity<TransacaoResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid TransacaoRequestDTO transacaoDTO){
+        var transacaoAtualizada = transacaoService.atualizar(id,transacaoDTO);
         return ResponseEntity.ok(transacaoAtualizada);
     }
 

@@ -2,11 +2,20 @@ package com.lifeboard.model;
 
 import com.lifeboard.model.enums.StatusMeta;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "lb_metas_financeiras")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MetaFinanceira {
 
     @Id
@@ -29,78 +38,9 @@ public class MetaFinanceira {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusMeta status; // EM_ANDAMENTO, CONCLUIDA, CANCELADA
+    private StatusMeta status;
 
     @ManyToOne
     @JoinColumn(name = "id_financeiro", nullable = false)
     private Financeiro financeiro;
-
-    public MetaFinanceira() {
-    }
-
-    public MetaFinanceira(Long id, String nome, BigDecimal valorMeta, BigDecimal valorAtual, LocalDate dataLimite, StatusMeta status, Financeiro financeiro) {
-        this.id = id;
-        this.nome = nome;
-        this.valorMeta = valorMeta;
-        this.valorAtual = valorAtual;
-        this.dataLimite = dataLimite;
-        this.status = status;
-        this.financeiro = financeiro;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public BigDecimal getValorMeta() {
-        return valorMeta;
-    }
-
-    public void setValorMeta(BigDecimal valorMeta) {
-        this.valorMeta = valorMeta;
-    }
-
-    public BigDecimal getValorAtual() {
-        return valorAtual;
-    }
-
-    public void setValorAtual(BigDecimal valorAtual) {
-        this.valorAtual = valorAtual;
-    }
-
-    public LocalDate getDataLimite() {
-        return dataLimite;
-    }
-
-    public void setDataLimite(LocalDate dataLimite) {
-        this.dataLimite = dataLimite;
-    }
-
-    public StatusMeta getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusMeta status) {
-        this.status = status;
-    }
-
-    public Financeiro getFinanceiro() {
-        return financeiro;
-    }
-
-    public void setFinanceiro(Financeiro financeiro) {
-        this.financeiro = financeiro;
-    }
 }
