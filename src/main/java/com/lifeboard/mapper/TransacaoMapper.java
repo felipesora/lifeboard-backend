@@ -1,7 +1,7 @@
 package com.lifeboard.mapper;
 
-import com.lifeboard.dto.TransacaoRequestDTO;
-import com.lifeboard.dto.TransacaoResponseDTO;
+import com.lifeboard.dto.transacao.TransacaoRequestDTO;
+import com.lifeboard.dto.transacao.TransacaoResponseDTO;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Transacao;
 

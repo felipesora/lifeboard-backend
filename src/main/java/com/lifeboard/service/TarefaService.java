@@ -1,10 +1,11 @@
 package com.lifeboard.service;
 
-import com.lifeboard.dto.TarefaResponseDTO;
+import com.lifeboard.dto.tarefa.TarefaRequestDTO;
+import com.lifeboard.dto.tarefa.TarefaResponseDTO;
 import com.lifeboard.mapper.TarefaMapper;
 import com.lifeboard.model.Tarefa;
-import com.lifeboard.model.Transacao;
 import com.lifeboard.repository.TarefaRepository;
+import com.lifeboard.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,9 @@ public class TarefaService {
     @Autowired
     private TarefaRepository tarefaRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     public Page<TarefaResponseDTO> listarTodos(Pageable pageable) {
         return tarefaRepository.findAllByOrderByIdAsc(pageable)
                 .map(TarefaMapper::toDTO);
@@ -28,20 +32,22 @@ public class TarefaService {
         return TarefaMapper.toDTO(tarefa);
     }
 
-    public TarefaResponseDTO salvar(Tarefa tarefa) {
-        var tarefaSalva = tarefaRepository.save(tarefa);
-
+    public TarefaResponseDTO salvar(TarefaRequestDTO tarefaDTO) {
+        var usuario = usuarioService.buscarEntidadePorId(tarefaDTO.getUsuarioId());
+        var tarefaSalva = tarefaRepository.save(TarefaMapper.toEntity(tarefaDTO, usuario));
         return TarefaMapper.toDTO(tarefaSalva);
     }
 
-    public TarefaResponseDTO atualizar(Long id, Tarefa novaTarefa) {
+    public TarefaResponseDTO atualizar(Long id, TarefaRequestDTO tarefaDTO) {
         Tarefa tarefaExistente = buscarEntidadePorId(id);
+        var usuario = usuarioService.buscarEntidadePorId(tarefaDTO.getUsuarioId());
 
-        tarefaExistente.setTitulo(novaTarefa.getTitulo());
-        tarefaExistente.setDescricao(novaTarefa.getDescricao());
-        tarefaExistente.setPrioridade(novaTarefa.getPrioridade());
-        tarefaExistente.setStatus(novaTarefa.getStatus());
-        tarefaExistente.setDataLimite(novaTarefa.getDataLimite());
+        tarefaExistente.setTitulo(tarefaDTO.getTitulo());
+        tarefaExistente.setDescricao(tarefaDTO.getDescricao());
+        tarefaExistente.setPrioridade(tarefaDTO.getPrioridade());
+        tarefaExistente.setStatus(tarefaDTO.getStatus());
+        tarefaExistente.setDataLimite(tarefaDTO.getDataLimite());
+        tarefaExistente.setUsuario(usuario);
 
         var tarefaAtualizada = tarefaRepository.save(tarefaExistente);
 

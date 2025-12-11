@@ -1,4 +1,4 @@
-package com.lifeboard.dto;
+package com.lifeboard.dto.auth;
 
 public record TokenDTO(String token) {
 }

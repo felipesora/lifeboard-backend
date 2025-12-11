@@ -1,12 +1,8 @@
 package com.lifeboard.controller;
 
-import com.lifeboard.dto.FinanceiroRequestDTO;
-import com.lifeboard.dto.TarefaRequestDTO;
-import com.lifeboard.dto.TarefaResponseDTO;
-import com.lifeboard.mapper.FinanceiroMapper;
+import com.lifeboard.dto.tarefa.TarefaRequestDTO;
+import com.lifeboard.dto.tarefa.TarefaResponseDTO;
 import com.lifeboard.mapper.TarefaMapper;
-import com.lifeboard.mapper.UsuarioMapper;
-import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Tarefa;
 import com.lifeboard.model.Usuario;
 import com.lifeboard.service.TarefaService;
@@ -35,9 +31,6 @@ public class TarefaController {
     @Autowired
     private TarefaService tarefaService;
 
-    @Autowired
-    private UsuarioService usuarioService;
-
     @Operation(summary = "Listar todas as tarefas", description = "Retorna uma página de tarefas com paginação e ordenação")
     @Parameters({
             @Parameter(name = "page", description = "Número da página (começa em 0)", example = "0"),
@@ -64,11 +57,8 @@ public class TarefaController {
     @Operation(summary = "Cadastrar uma nova tarefa")
     @ApiResponse(responseCode = "201", description = "Tarefa criada com sucesso")
     @PostMapping
-    public ResponseEntity<TarefaResponseDTO> salvar(@RequestBody @Valid TarefaRequestDTO dto, UriComponentsBuilder uriBuilder) {
-        Usuario usuario = usuarioService.buscarEntidadePorId(dto.getUsuarioId());
-        Tarefa tarefa = TarefaMapper.toEntity(dto, usuario);
-
-        var tarefaSalva = tarefaService.salvar(tarefa);
+    public ResponseEntity<TarefaResponseDTO> salvar(@RequestBody @Valid TarefaRequestDTO tarefaDTO, UriComponentsBuilder uriBuilder) {
+        var tarefaSalva = tarefaService.salvar(tarefaDTO);
 
         var uri = uriBuilder.path("/api/tarefas/{id}").buildAndExpand(tarefaSalva.getId()).toUri();
 
@@ -77,20 +67,8 @@ public class TarefaController {
 
     @Operation(summary = "Atualizar uma tarefa existente")
     @PutMapping("/{id}")
-    public ResponseEntity<TarefaResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid TarefaRequestDTO dto){
-        Usuario usuario = usuarioService.buscarEntidadePorId(dto.getUsuarioId());
-
-        Tarefa existente = tarefaService.buscarEntidadePorId(id);
-
-        existente.setTitulo(dto.getTitulo());
-        existente.setDescricao(dto.getDescricao());
-        existente.setStatus(dto.getStatus());
-        existente.setPrioridade(dto.getPrioridade());
-        existente.setDataLimite(dto.getDataLimite());
-        existente.setUsuario(usuario);
-
-        var tarefaAtualizada = tarefaService.atualizar(id, existente);
-
+    public ResponseEntity<TarefaResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid TarefaRequestDTO tarefaDTO){
+        var tarefaAtualizada = tarefaService.atualizar(id, tarefaDTO);
         return ResponseEntity.ok(tarefaAtualizada);
     }
 

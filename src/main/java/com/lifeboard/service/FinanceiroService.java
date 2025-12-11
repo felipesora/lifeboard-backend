@@ -1,6 +1,7 @@
 package com.lifeboard.service;
 
-import com.lifeboard.dto.FinanceiroResponseDTO;
+import com.lifeboard.dto.financeiro.FinanceiroRequestDTO;
+import com.lifeboard.dto.financeiro.FinanceiroResponseDTO;
 import com.lifeboard.mapper.FinanceiroMapper;
 import com.lifeboard.model.Financeiro;
 import com.lifeboard.model.Usuario;
@@ -12,13 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class FinanceiroService {
 
     @Autowired
     private FinanceiroRepository repository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     public Page<FinanceiroResponseDTO> listarTodos(Pageable pageable) {
         return repository.findAllByOrderByIdAsc(pageable)
@@ -32,19 +34,22 @@ public class FinanceiroService {
     }
 
     @Transactional
-    public FinanceiroResponseDTO salvar(Financeiro novoFinanceiro) {
-        var financeiro = repository.save(novoFinanceiro);
+    public FinanceiroResponseDTO salvar(FinanceiroRequestDTO financeiroDTO) {
+        var usuario = usuarioService.buscarEntidadePorId(financeiroDTO.getUsuarioId());
+        var financeiroSalvo = repository.save(FinanceiroMapper.toEntity(financeiroDTO, usuario));
 
-        return FinanceiroMapper.toDTO(financeiro);
+        return FinanceiroMapper.toDTO(financeiroSalvo);
     }
 
     @Transactional
-    public FinanceiroResponseDTO atualizar(Long id, Financeiro novoFinanceiro) {
+    public FinanceiroResponseDTO atualizar(Long id, FinanceiroRequestDTO financeiroDTO) {
         var financeiroExistente = buscarEntidadePorId(id);
+        var usuario = usuarioService.buscarEntidadePorId(financeiroDTO.getUsuarioId());
+        var financeiroEntity = FinanceiroMapper.toEntity(financeiroDTO, usuario);
 
-        financeiroExistente.setSaldoAtual(novoFinanceiro.getSaldoAtual());
-        financeiroExistente.setSalarioMensal(novoFinanceiro.getSalarioMensal());
-        financeiroExistente.setUsuario(novoFinanceiro.getUsuario());
+        financeiroExistente.setSaldoAtual(financeiroEntity.getSaldoAtual());
+        financeiroExistente.setSalarioMensal(financeiroEntity.getSalarioMensal());
+        financeiroExistente.setUsuario(financeiroEntity.getUsuario());
 
         var financeiroAtualizado = repository.save(financeiroExistente);
 

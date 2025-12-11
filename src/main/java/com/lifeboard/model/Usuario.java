@@ -2,6 +2,7 @@ package com.lifeboard.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "lb_usuarios")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Usuario implements UserDetails {
 
     @Id
@@ -38,75 +43,6 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefa> tarefas;
-
-    public Usuario() {
-    }
-
-    public Usuario(Long id, String nome, String email, String senha, byte[] fotoPerfil, Financeiro financeiro, List<Tarefa> tarefas) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-        this.fotoPerfil = fotoPerfil;
-        this.financeiro = financeiro;
-        this.tarefas = tarefas;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public byte[] getFotoPerfil() {
-        return fotoPerfil;
-    }
-
-    public void setFotoPerfil(byte[] fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
-    }
-
-    public Financeiro getFinanceiro() {
-        return financeiro;
-    }
-
-    public void setFinanceiro(Financeiro financeiro) {
-        this.financeiro = financeiro;
-    }
-
-    public List<Tarefa> getTarefas() {
-        return tarefas;
-    }
-
-    public void setTarefas(List<Tarefa> tarefas) {
-        this.tarefas = tarefas;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
