@@ -64,7 +64,7 @@ class FinanceiroControllerTest {
         mockMvc.perform(get("/api/financeiros?page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id_financeiro").value(1))
-                .andExpect(jsonPath("$.content[0].saldo").value(300.0));
+                .andExpect(jsonPath("$.content[0].saldo_atual").value(1000.0));
     }
 
     @Test
@@ -85,7 +85,7 @@ class FinanceiroControllerTest {
         mockMvc.perform(get("/api/financeiros/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id_financeiro").value(1))
-                .andExpect(jsonPath("$.saldo").value(500.0));
+                .andExpect(jsonPath("$.saldo_atual").value(500.0));
     }
 
     @Test
@@ -132,7 +132,7 @@ class FinanceiroControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.saldo").value(400.0));
+                .andExpect(jsonPath("$.saldo_atual").value(400.0));
     }
 
     @Test
