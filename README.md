@@ -140,11 +140,11 @@ A API do LifeBoard está publicada e documentada para consumo externo:
 
 **Base URL da API**
 
-[link do deploy backend]()
+[https://lifeboard-backend-cv3r.onrender.com](https://lifeboard-backend-cv3r.onrender.com)
 
 **Swagger / OpenAPI**
 
-[link do deploy backend]()
+[https://lifeboard-backend-cv3r.onrender.com/swagger-ui/index.html](https://lifeboard-backend-cv3r.onrender.com/swagger-ui/index.html)
 
 ---
 
