@@ -132,7 +132,7 @@ O LifeBoard está disponível publicamente em produção, permitindo acesso tant
 
 A interface do LifeBoard pode ser acessada online pelo link abaixo:
 
-[link do deploy frontend]()
+[https://lifeboard-frontend.vercel.app/](https://lifeboard-frontend.vercel.app/)
 
 ### 🛠️ API REST (Backend)
 
